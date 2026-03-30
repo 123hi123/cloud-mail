@@ -26,14 +26,24 @@ To：\u200B${email.toEmail}`
 To：\u200B${email.toEmail}`
 	}
 
-	const text = (emailUtils.formatText(email.text) || emailUtils.htmlToText(email.content))
-		.replace(/</g, '&lt;')
-		.replace(/>/g, '&gt;');
+	const magicLink = emailUtils.extractClaudeMagicLink(email);
+	const text = emailUtils.truncateText(
+		emailUtils.formatText(email.text) || emailUtils.htmlToText(email.content),
+		3000
+	);
 
-	if(tgMsgText === 'show') {
+	if (magicLink) {
+		const escapedMagicLink = emailUtils.escapeHtml(magicLink);
 		template += `
 
-${text}`
+Magic Link：\u200B<a href="${escapedMagicLink}">${escapedMagicLink}</a>`
+	}
+
+	if(tgMsgText === 'show') {
+		const escapedText = emailUtils.escapeHtml(text);
+		template += `
+
+${escapedText}`
 	}
 
 	return template;
